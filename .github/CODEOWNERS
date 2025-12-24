@@ -1,0 +1,11 @@
+# Default owner for all infrastructure files
+* @devops-labs-org/devopslab-admin
+
+# Infrastructure code ownership (IaC, configs)
+/* @devops-labs-org/devopslab-admin @devops-labs-org/srikanthchowdry
+
+# Documentation ownership
+*.md @devops-labs-org/devopslab-admin
+
+# Scripts and automation ownership
+/scripts/ @devops-labs-org/devopslab-admin @devops-labs-org/srikanthchowdry
