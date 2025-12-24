@@ -1,0 +1,17 @@
+# State and config files
+*.tfstate
+*.tfvars
+
+# Log files
+*.log
+
+# Environment files
+.env
+
+# Editor folders
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
