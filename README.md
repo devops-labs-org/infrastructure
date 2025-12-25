@@ -1,15 +1,16 @@
 # Infrastructure Repository
 
-# What this repository is for
+---
+
+## What this repository is for
+
 This repository is used to store **infrastructure-related files only**.
 It contains configurations, scripts, and documents that define how systems are created, connected, and managed.
 
-The main goal is to **keep infrastructure separate from application code**.
-This repository helps new and existing engineers understand how the environment is set up without digging into application logic.
-
 ---
 
-# What type of changes are allowed
+## What type of changes are allowed
+
 - Infrastructure configuration files
 - Environment setup documentation
 - CI/CD infrastructure definitions
@@ -19,37 +20,42 @@ All changes must be made through a Pull Request and should explain **what change
 
 ---
 
-# What changes are NOT allowed
+## What changes are NOT allowed
 - Application source code
 - Business logic or feature changes
 - Frontend or backend service code
 - Secrets, passwords, API keys, or tokens
 - Temporary experiments or personal files
 
-If something is not related to infrastructure, it does not belong in this repository.
+If something is not related to infrastructure, it does not belong in this repository.---
+
+## What happens when things fail
+
+When parts of the infrastructure break, the system automatically shifts work to backup machines or routes to keep things running.  
+Data issues may slow down writes or cause short delays, but the platform tries to protect data and stay usable.  
+If failures stack up or backups can't keep up, customers may see slow responses or temporary service outages until recovery completes.
 
 ---
 
-# Who owns this repository
-This repository is owned by the **Infrastructure / Platform team**.
-Only approved maintainers can merge changes to the main branch.
+## How rollback or recovery works
 
-All contributors are expected to follow the defined branching rules and review process.
-
----
-
-# Risk if this repository is misused
-If application code or secret data is added here by mistake,
-it may be exposed to more people than intended.
-
-This can lead to security leaks, accidental production outages,
-or broken infrastructure that is hard to roll back during incidents.
-
-Following repository boundaries is critical
-to keep systems stable, secure, and recoverable.
+When something goes wrong, we restore the last known stable infrastructure setup instead of fixing pieces one-by-one.  
+The system then rebuilds or replaces broken parts automatically to match that stable state.  
+If the restored state is outdated or missing recent changes, some services may briefly behave differently until updates are re-applied safely.
 
 ---
 
-# Final note
-This repository is a shared responsibility.
-Make changes carefully, document clearly, and always think about production impact.
+## Who is impacted by failure
+
+If the infrastructure breaks and backups can’t fully cover the load, customers may face slow responses or short outages.  
+Product teams might need to pause new releases until the platform becomes stable again.  
+
+---
+
+## Risk if misused
+
+If someone adds application code or secrets in this repo, sensitive data could be exposed or the platform could behave unpredictably.  
+Wrong changes here might break core infrastructure and make recovery harder during an outage.  
+Keeping this repo focused only on infrastructure is important to avoid security leaks and prevent failures that affect everyone.
+
+---
