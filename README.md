@@ -4,58 +4,62 @@
 
 ## What this repository is for
 
-This repository is used to store **infrastructure-related files only**.
-It contains configurations, scripts, and documents that define how systems are created, connected, and managed.
+Infrastructure code defines the cloud foundation of the organization.  
+It includes provisioning scripts, automation workflows, and configuration files that shape the platform running applications.
+
+### How environments are separated
+
+Infrastructure is deployed in multiple stages such as development, staging, and production.  
+Each environment uses different configuration values and is updated in order to catch issues early.  
 
 ---
 
 ## What type of changes are allowed
 
-- Infrastructure configuration files
-- Environment setup documentation
-- CI/CD infrastructure definitions
-- Access, networking, or resource-related configs
+- Infrastructure configuration files 
+- Networking, access rules, and scaling configurations
+- Environment setup and platform documentation
+- CI/CD infrastructure components
 
-All changes must be made through a Pull Request and should explain **what changed and why**.
+All changes must go through a Pull Request and clearly state **what changed and why**.
 
 ---
 
 ## What changes are NOT allowed
-- Application source code
-- Business logic or feature changes
-- Frontend or backend service code
-- Secrets, passwords, API keys, or tokens
-- Temporary experiments or personal files
 
-If something is not related to infrastructure, it does not belong in this repository.---
+- Application source code, business logic, frontend or backend services
+- Secrets, passwords, tokens, API keys, certificates
+- Experimental changes that are not related to infrastructure
+
+If a change does not affect infrastructure, it does not belong here.
+
+### How secrets are handled
+
+Secrets are never stored inside this repository.  
+They are managed using secure secret storage systems and injected at deployment time.  
+If a secret is committed accidentally, it must be revoked and replaced immediately to avoid exposure.
+
+---
 
 ## What happens when things fail
 
-When parts of the infrastructure break, the system automatically shifts work to backup machines or routes to keep things running.  
-Data issues may slow down writes or cause short delays, but the platform tries to protect data and stay usable.  
-If failures stack up or backups can't keep up, customers may see slow responses or temporary service outages until recovery completes.
+If infrastructure components fail or become unreachable, workloads shift to backup resources where possible.  
+Users may see slower responses or temporary outages while systems recover, depending on the severity of the failure.  
+Product teams may pause releases until stability returns to prevent further impact.
 
 ---
 
 ## How rollback or recovery works
 
-When something goes wrong, we restore the last known stable infrastructure setup instead of fixing pieces one-by-one.  
-The system then rebuilds or replaces broken parts automatically to match that stable state.  
-If the restored state is outdated or missing recent changes, some services may briefly behave differently until updates are re-applied safely.
+When failures occur, the last known stable infrastructure state is restored instead of fixing components individually.  
+Automation rebuilds or replaces affected resources to match that stable version across environments.  
+Rollback keeps production working while updated changes are retested safely.
 
 ---
 
 ## Who is impacted by failure
 
-If the infrastructure breaks and backups can’t fully cover the load, customers may face slow responses or short outages.  
-Product teams might need to pause new releases until the platform becomes stable again.  
-
----
-
-## Risk if misused
-
-If someone adds application code or secrets in this repo, sensitive data could be exposed or the platform could behave unpredictably.  
-Wrong changes here might break core infrastructure and make recovery harder during an outage.  
-Keeping this repo focused only on infrastructure is important to avoid security leaks and prevent failures that affect everyone.
+Service interruptions can affect customers and delay releases.  
+Internal teams may need to coordinate fixes, but protecting production availability remains the top priority.
 
 ---
