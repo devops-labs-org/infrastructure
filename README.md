@@ -2,60 +2,143 @@
 
 ---
 
-## What this repository is for
+## 1. What this repository is for
 
-This repository is used to store **infrastructure-related files only**.
-It contains configurations, scripts, and documents that define how systems are created, connected, and managed.
+This repository defines **AWS network infrastructure using Terraform**.  
+It is responsible for creating and managing the **VPC, subnets, routing, security groups, and validation compute**.
 
----
-
-## What type of changes are allowed
-
-- Infrastructure configuration files
-- Environment setup documentation
-- CI/CD infrastructure definitions
-- Access, networking, or resource-related configs
-
-All changes must be made through a Pull Request and should explain **what changed and why**.
+This repo is treated as **shared platform code** used by multiple engineers and environments.  
+Changes here affect the foundation of all workloads.
 
 ---
 
-## What changes are NOT allowed
-- Application source code
-- Business logic or feature changes
-- Frontend or backend service code
-- Secrets, passwords, API keys, or tokens
-- Temporary experiments or personal files
+## 2. What changes are allowed
 
-If something is not related to infrastructure, it does not belong in this repository.---
+- Terraform infrastructure code
+- Network, security, and routing configuration
+- Environment definitions (dev / stage / prod)
+- Documentation related to infrastructure behavior
 
-## What happens when things fail
-
-When parts of the infrastructure break, the system automatically shifts work to backup machines or routes to keep things running.  
-Data issues may slow down writes or cause short delays, but the platform tries to protect data and stay usable.  
-If failures stack up or backups can't keep up, customers may see slow responses or temporary service outages until recovery completes.
+All changes must be:
+- Made via Pull Request
+- Reviewed before merge
+- Clearly explained (what + why)
 
 ---
 
-## How rollback or recovery works
+## 3. What changes are NOT allowed
 
-When something goes wrong, we restore the last known stable infrastructure setup instead of fixing pieces one-by-one.  
-The system then rebuilds or replaces broken parts automatically to match that stable state.  
-If the restored state is outdated or missing recent changes, some services may briefly behave differently until updates are re-applied safely.
+- Application or service code
+- Secrets, passwords, API keys
+- Temporary experiments
+- Manual AWS Console changes
 
----
-
-## Who is impacted by failure
-
-If the infrastructure breaks and backups can’t fully cover the load, customers may face slow responses or short outages.  
-Product teams might need to pause new releases until the platform becomes stable again.  
+This repository is **Terraform-only** and infrastructure-focused.
 
 ---
 
-## Risk if misused
+## 4. Architecture Decisions
 
-If someone adds application code or secrets in this repo, sensitive data could be exposed or the platform could behave unpredictably.  
-Wrong changes here might break core infrastructure and make recovery harder during an outage.  
-Keeping this repo focused only on infrastructure is important to avoid security leaks and prevent failures that affect everyone.
+The network follows a **layered design** to reduce risk and improve clarity.
+
+Three layers are used:
+- **Public** – entry points only (ALB, NAT, IGW)
+- **App** – private compute workloads
+- **Data** – databases and stateful services
+
+Each layer has its own:
+- Subnets
+- Route tables
+- Security groups
+
+This prevents accidental access and limits blast radius.
 
 ---
+
+## 5. CIDR Strategy
+
+The VPC uses: 10.0.0.0/16
+
+
+This CIDR was chosen to:
+- Avoid future rework
+- Support multiple environments
+- Allow long-term scaling
+
+Subnets are split by purpose:
+- Smaller CIDRs for public access
+- Larger CIDRs for application workloads
+- Isolated CIDRs for data
+
+Extra CIDR space is reserved for future growth.
+
+---
+
+## 6. How Routing Works
+
+Routing is explicit and minimal:
+
+- **Public subnets**
+  - Route to Internet Gateway
+  - Used only for ingress and NAT
+
+- **App subnets**
+  - Route to NAT Gateway
+  - No inbound internet access
+
+- **Data subnets**
+  - No internet routes
+  - Internal access only
+
+There is no accidental cross-layer routing.
+
+---
+
+## 7. How Security Is Enforced
+
+Security is enforced using **least privilege**:
+
+- No default security groups
+- Separate security groups per layer
+- Ingress allowed only from required sources
+
+Rules follow this flow:
+- Internet → ALB
+- ALB → App
+- App → Data
+
+Direct internet access to private layers is blocked.
+
+---
+
+## 8. How to Add or Scale Safely
+
+### Add a new subnet
+- Add CIDR to the subnet module
+- Associate it with the correct route table
+- Apply Terraform
+
+### Add a new Availability Zone
+- Add AZ to environment config
+- Terraform creates matching subnets automatically
+
+### Add a new environment
+- Copy `environments/dev`
+- Change backend state key
+- Keep the same CIDR structure
+- No module changes needed
+
+---
+
+## 9. How to Safely Run Terraform
+
+Always run Terraform from an environment directory.
+
+Recommended flow:
+
+```bash
+terraform init
+terraform plan
+terraform apply
+
+
