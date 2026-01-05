@@ -132,13 +132,21 @@ module "security_groups" {
 }
 
 ########################################
+# IAM (for EC2 validation)
+########################################
+module "iam" {
+  source = "../../modules/iam"
+}
+
+########################################
 # Validation EC2 (Step 10)
 ########################################
 module "validation_ec2" {
   source = "../../modules/ec2"
 
-  subnet_id = module.subnets.app_subnet_ids[0]
-  security_group_id = module.security_groups.app_sg_id
+  subnet_id            = module.subnets.app_subnet_ids[0]
+  security_group_id    = module.security_groups.app_sg_id
+  iam_instance_profile = module.iam.instance_profile_name
 
   tags = {
     Environment = "dev"

@@ -14,18 +14,19 @@ data "aws_ami" "amazon_linux" {
 }
 
 resource "aws_instance" "validation" {
-  ami           = data.aws_ami.amazon_linux.id
-  instance_type = "t2.micro"
-
+  ami                    = data.aws_ami.amazon_linux.id
+  instance_type          = "t2.micro"
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [var.security_group_id]
+
+  iam_instance_profile = var.iam_instance_profile   # ✅ REQUIRED
 
   associate_public_ip_address = false
 
   tags = merge(
     var.tags,
     {
-      Name = "validation-app-${var.tags["Environment"]}"
+      Name = "validation-ec2"
       Role = "validation"
     }
   )
