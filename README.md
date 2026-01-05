@@ -94,7 +94,32 @@ There is no accidental cross-layer routing.
 
 ---
 
-## 7. How Security Is Enforced
+## 7. NAT Gateway Strategy
+
+A single NAT Gateway is used in the dev environment to balance
+cost and functionality.
+
+Why one NAT:
+- Dev workloads are non-critical
+- Reduces cost while still allowing outbound access
+- Simpler to operate and troubleshoot
+
+AZ failure impact:
+- If the AZ hosting the NAT fails, outbound internet access
+  from private subnets is temporarily unavailable
+- Inbound traffic is NOT affected
+
+Production consideration:
+- Production environments should use one NAT per AZ
+  to avoid single-AZ dependency
+
+Cost note:
+- NAT Gateways incur hourly and data processing charges
+- Using one NAT in dev keeps costs controlled
+
+---
+
+## 8. How Security Is Enforced
 
 Security is enforced using **least privilege**:
 
@@ -111,7 +136,7 @@ Direct internet access to private layers is blocked.
 
 ---
 
-## 8. How to Add or Scale Safely
+## 9. How to Add or Scale Safely
 
 ### Add a new subnet
 - Add CIDR to the subnet module
@@ -130,7 +155,7 @@ Direct internet access to private layers is blocked.
 
 ---
 
-## 9. How to Safely Run Terraform
+## 10. How to Safely Run Terraform
 
 Always run Terraform from an environment directory.
 
