@@ -153,3 +153,34 @@ module "validation_ec2" {
     ManagedBy   = "terraform"
   }
 }
+
+########################################
+# SECOND VPC (VPC-CENTRIC MODULE)
+########################################
+module "vpc_centric" {
+  source = "../../modules/vpc_centric"
+
+  vpc_name = "dev-vpc-2"
+  vpc_cidr = "10.1.0.0/16"
+
+  availability_zones = [
+    "us-east-1a",
+    "us-east-1b"
+  ]
+
+  public_subnet_cidrs = [
+    "10.1.0.0/21",
+    "10.1.8.0/21"
+  ]
+
+  private_subnet_cidrs = [
+    "10.1.16.0/21",
+    "10.1.24.0/21"
+  ]
+
+  tags = {
+    Environment = "dev"
+    ManagedBy   = "terraform"
+    Purpose     = "vpc-centric"
+  }
+}
