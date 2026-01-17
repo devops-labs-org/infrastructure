@@ -15,3 +15,11 @@
 # System files
 .DS_Store
 Thumbs.db
+
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+
+
